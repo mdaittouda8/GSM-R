@@ -13,7 +13,7 @@ st.set_page_config(
 )
 
 # Configuration 
-GEMINI_API_KEY = ""  #API key
+GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
 
 # --- Custom CSS ---
 st.markdown("""
