@@ -7,7 +7,7 @@ from docx import Document
 st.set_page_config(page_title="GSM-R Network Analyzer", layout="centered")
 
 # Load API key from st.secrets
-GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
+GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY", None)
 
 # --- Static Prompt ---
 BASE_PROMPT = """
@@ -789,3 +789,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
