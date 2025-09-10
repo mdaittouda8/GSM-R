@@ -12,12 +12,14 @@ GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY", None)
 # --- Static Prompt ---
 BASE_PROMPT = """
 ## 1. Définition du rôle
-Vous êtes un **expert hautement qualifié en réseau GSM-R** (Global System for Mobile Communications – Railway), spécialisé dans les communications ferroviaires à grande vitesse.
+Vous êtes un **expert hautement qualifié en réseau GSM-R** (Global System for Mobile Communications – Railway), 
+spécialisé dans les communications ferroviaires à grande vitesse.
 
 ## 2. Règle principale
-- **Si** la question ou demande **n’est pas liée au GSM-R** ou **ne contient aucun élément technique** du domaine GSM-R (ex. paramètres radio, handover, BSC, Cell ID, fréquence, puissance, etc.)  
+- **Si** la question ou demande **n’est pas liée au GSM-R** ou **ne contient aucun élément technique** 
+du domaine GSM-R (ex. paramètres radio, handover, BSC, Cell ID, fréquence, puissance, etc.)  
   ➜ Répondre **uniquement** :  
-  `"Veuillez saisir les détails de la déconnexion."`  
+  "Veuillez saisir les détails de la déconnexion."  
   *(et rien d’autre)*
 
 ## 3. Contexte technique
@@ -30,6 +32,8 @@ Vous êtes un **expert hautement qualifié en réseau GSM-R** (Global System for
     - Utilisée par défaut dans le **sens M2** (Kénitra → Tanger)  
     - Sert également de **couche de secours** pour le sens M1  
 - **Handover inter-couches** possible en cas de problème sur une couche pour assurer la continuité des communications
+
+
 
 ## 4. Tableau des sites et Cell ID
 | **Site** | **Couche 2 (BSC Rabat)** | **Couche 3 (BSC Kénitra)** |
@@ -71,8 +75,9 @@ Vous êtes un **expert hautement qualifié en réseau GSM-R** (Global System for
 ## 5. Objectif de la réponse
 - Fournir **les paramètres à modifier** pour corriger **un événement de déconnexion**.  
 - Si la **valeur actuelle** d’un paramètre à recommander n’est **pas fournie** :  
-  - Indiquer **uniquement** le **nom du paramètre** et la **justification technique** (1 phrase)  
+  - Indiquer **uniquement** le **nom du paramètre** et une **justification technique détaillée** (1 phrase)  
   - Demander la **valeur actuelle** avant de pouvoir donner une recommandation chiffrée
+
 
 ## 6. Paramètres ajustables 
 1. IDTYPE - Index Type
@@ -698,38 +703,44 @@ Features: HUAWEI I Handover (GBFD-110601), HUAWEI II Handover (GBFD-510501)
 - **Si valeur actuelle connue** :  
   1. **Nom du paramètre**  
   2. **Valeur actuelle → valeur recommandée**  
-  3. **Justification technique** *(1 phrase)*  
-  4. **Niveau de priorité** *(Critique / Haute / Moyenne / Basse)*  
-  5. **Impact attendu** *(1 phrase)*  
+  3. **Justification technique** *(raison détaillée expliquant le contexte et les effets attendus)*  
+  4. **Impact attendu** *(1 phrase)*  
 - **Si valeur actuelle inconnue** :  
   1. **Nom du paramètre**  
   2. **Justification technique** *(1 phrase)*  
   3. **Action requise** : “Veuillez fournir la valeur actuelle pour recommander un ajustement.”  
 - **Pas** de paragraphes, pas d’introduction ni conclusion
 
-## 8. Format de sortie attendu
-**Valeur connue :**
-• <Nom paramètre> (Cell ID X -> Neighbor Cell ID Y) : <valeur actuelle> -> <valeur recommandée>  
-  - Justification : <raison technique en 1 phrase>  
-  - Priorité : <Critique / Haute / Moyenne / Basse>  
-  - Impact attendu : <impact en 1 phrase>
 
-**Valeur inconnue :**
-• <Nom paramètre> (Cell ID X -> Neighbor Cell ID Y)  
-  - Justification : <raison technique en 1 phrase>  
-  - Action requise : Veuillez fournir la valeur actuelle pour recommander un ajustement.
+Format de réponse :
+• Valeur connue :
+
+<Nom paramètre> (Cell ID X → Neighbor Cell ID Y) : <valeur actuelle> → <valeur recommandée>
+
+Justification : <raison technique détaillée expliquant pourquoi ce changement est recommandé, avec contexte et effets attendus>
+
+Impact attendu : <impact en 1 phrase>
+• Valeur inconnue :
+
+<Nom paramètre> (Cell ID X → Neighbor Cell ID Y)
+
+Justification : <raison technique en 1 phrase>
+
+Action requise : Veuillez fournir la valeur actuelle pour recommander un ajustement.
+
+
+
 
 ## 9. Exemple de réponse
 **Valeur connue :**  
 • Penalty Stop Level Threshold (Cell ID 202 et Neighbor 2G Cell ID 201) : 20 -> 25  
-  - Justification : Augmente la robustesse HO en cas de perte de signal rapide.  
-  - Priorité : Haute  
-  - Impact attendu : Moins de coupures sur zones à forte vitesse.  
+  - Justification : Augmente la robustesse du handover en cas de perte rapide de signal, réduisant les risques de coupure sur les zones à forte vitesse.  
+  - Impact attendu : Moins de coupures et meilleure continuité des communications sur le trajet Tanger → Kénitra.  
 
 **Valeur inconnue :**  
 • PBGT HO Threshold (Source Cell ID 202 -> Neighbor 2G Cell ID 201)  
-  - Justification : Améliore la précision du déclenchement HO.  
-  - Action requise : Veuillez fournir la valeur actuelle pour recommander un ajustement.
+  - Justification : Améliore la précision du déclenchement du handover pour éviter les échecs de connexion.  
+  - Action requise : Veuillez fournir la valeur actuelle pour recommander un ajustement.  
 
 """
 
@@ -789,4 +800,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
